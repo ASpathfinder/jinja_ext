@@ -1,0 +1,23 @@
+<group name="equations">
+&lt;{{ var }}{{ op1 | re("=") }}{{ equation }}{{ op2 | re("\s*=\s*") }}{{ comma | re("\s*,\s*") }}{{ unit | re("\s*[^\s]+\s*") }}&gt;
+</group>
+
+<group name="var_with_unit">
+&lt;{{ var | re("[^=]*") }}{{ op1 | re("\s*=\s*") }}{{ comma | re("\s*,\s*") }}{{ unit | re("\s*[^\s]+\s*") }}&gt;
+</group>
+
+<group name="var">
+&lt;{{ var | re("[^=]*") }}{{ op1 | re("\s*=\s*") }}&gt;
+</group>
+
+<group name="var_2">
+&lt;{{ var | re("[^=]*") }}{{ op1 | re("\s*=\s*") }}{{ op2 | re("=\s*") }}&gt;
+</group>
+
+<group name="math_block">
+&lt;{{ math_block | re("Math") }}&gt;
+</group>
+
+<group name="math_endblock">
+&lt;{{ math_endblock | re("/Math") }}&gt;
+</group>
