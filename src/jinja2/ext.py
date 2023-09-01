@@ -681,6 +681,35 @@ class SwitchStatementExtension(Extension):
         return result
 
 
+class MathExtension(Extension):
+    tags = {"math"}
+
+    def __init__(self, environment):
+        super().__init__(environment)
+
+    def parse(self, parser):
+        lineno = next(parser.stream).lineno
+
+        # now we parse a single expression that is used as cache key.
+        # args = [parser.parse_expression()]
+
+        # # if there is a comma, the user provided a timeout.  If not use
+        # # None as second parameter.
+        # if parser.stream.skip_if("comma"):
+        #     args.append(parser.parse_expression())
+        # else:
+        #   args.append(nodes.Const(None))
+
+        # now we parse the body of the cache block up to `endcache` and
+        # drop the needle (which would always be `endcache` in that case)
+        body = parser.parse_statements(["name:endmath"], drop_needle=True)
+        print(body)
+
+        # now return a `CallBlock` node that calls our _cache_support
+        # helper method on this extension.
+        return body
+
+
 def extract_from_ast(
     ast: nodes.Template,
     gettext_functions: t.Sequence[str] = GETTEXT_FUNCTIONS,

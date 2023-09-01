@@ -11,6 +11,11 @@ def convert(exp, **kwargs):
     return exp_env.from_string(exp).render(**kwargs)
 
 
+def process(ts):
+    return 'processed_ts'
+
+
 global_function_mapping = {
     'convert': convert,
+    'process': process,
 }
