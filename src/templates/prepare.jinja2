@@ -1,0 +1,9 @@
+{% raw -%}
+{% extends 'base.jinja2' %}
+
+{% block main %}
+{% endraw %}
+{{ user_raw |safe }}
+{% raw %}
+{%- endblock %}
+{% endraw %}

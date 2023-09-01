@@ -342,6 +342,17 @@ class If(Stmt):
     else_: t.List[Node]
 
 
+
+class Switch(Stmt):
+    """Switch `target`, test for each case, else default"""
+
+    fields = ("test", "body", "case_", "default_")
+    test: Node
+    body: t.List[Node]
+    case_: t.List["Switch"]
+    default_: t.List[Node]
+
+
 class Macro(Stmt):
     """A macro definition.  `name` is the name of the macro, `args` a list of
     arguments and `defaults` a list of defaults if there are any.  `body` is

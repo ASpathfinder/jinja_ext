@@ -1314,6 +1314,29 @@ class CodeGenerator(NodeVisitor):
             self.blockvisit(node.else_, if_frame)
             self.outdent()
 
+    def visit_Switch(self, node: nodes.Switch, frame: Frame) -> None:
+        if_frame = frame.soft()
+        for i, switch_case_ in enumerate(node.case_):
+            if i == 0:
+                self.writeline("if ", switch_case_)
+                self.visit(switch_case_.test, if_frame)
+                self.write(":")
+                self.indent()
+                self.blockvisit(switch_case_.body, if_frame)
+                self.outdent()
+            else:
+                self.writeline("elif ", switch_case_)
+                self.visit(switch_case_.test, if_frame)
+                self.write(":")
+                self.indent()
+                self.blockvisit(switch_case_.body, if_frame)
+                self.outdent()
+        if node.default_:
+            self.writeline("else:")
+            self.indent()
+            self.blockvisit(node.default_, if_frame)
+            self.outdent()
+
     def visit_Macro(self, node: nodes.Macro, frame: Frame) -> None:
         macro_frame, macro_ref = self.macro_body(node, frame)
         self.newline()

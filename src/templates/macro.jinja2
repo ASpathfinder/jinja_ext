@@ -1,0 +1,21 @@
+{% macro calculate(exp) -%}
+    {{- convert(exp, **kwargs) |safe -}}
+{% endmacro %}
+
+{% macro equation(exp) %}
+    {% set a, b, c = varargs %}
+    {% set e = exp|calc_equation(a=a, b=b, c=c) %}
+    如表1编号1所示，$a={{ a }},b={{ b }},c={{ c }}$，带入方程{{ exp }}。所得一元二次方程如下所示：
+    {{ e.equation|safe }}
+    \\
+    解：\\
+    {{ e.process|safe }}
+    {% if e.result|int < 0 %}
+    因为：$\Delta \textless {{ e.result }}$，所以方程无解
+    {% elif e.result|int > 0 %}
+    因为：$\Delta > 0$，所以方程解为两个不等的实数根，如下所示：
+    {% else %}
+    因为：$\Delta = 0$，所以方程解为重根，如下所示：
+    {% endif %}
+    {{ e.final_result }}
+{% endmacro %}

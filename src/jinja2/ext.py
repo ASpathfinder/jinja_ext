@@ -641,6 +641,46 @@ class DebugExtension(Extension):
         return pprint.pformat(result, depth=3, compact=True)
 
 
+class SwitchStatementExtension(Extension):
+    tags = {"switch"}
+
+    def __init__(self, environment):
+        super().__init__(environment)
+
+    def parse(self, parser):
+        node = result = nodes.Switch(lineno=next(parser.stream).lineno)
+        i = 0
+        switch_target = None
+        while True:
+            i += 1
+            if i == 1:
+                switch_target = parser.parse_tuple(with_condexpr=False)
+                node.test = None
+
+            if i > 1:
+                current_value = parser.parse_tuple(with_condexpr=False)
+                node.test = nodes.Compare(switch_target, [nodes.Operand('eq',
+                                                                        nodes.Const(
+                                                                            current_value.value,
+                                                                            lineno=parser.stream.current.lineno))],
+                                          lineno=parser.stream.current.lineno)
+
+            node.body = parser.parse_statements(
+                ("name:case", "name:default", "name:endswitch"))
+            node.case_ = []
+            node.default_ = []
+            token = next(parser.stream)
+            if token.test("name:case"):
+                node = nodes.Switch(lineno=parser.stream.current.lineno)
+                result.case_.append(node)
+                continue
+            elif token.test("name:default"):
+                result.default_ = parser.parse_statements(("name:endswitch",),
+                                                          drop_needle=True)
+            break
+        return result
+
+
 def extract_from_ast(
     ast: nodes.Template,
     gettext_functions: t.Sequence[str] = GETTEXT_FUNCTIONS,
