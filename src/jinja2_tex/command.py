@@ -35,10 +35,30 @@ def render_tex(template, output_dir):
 @click.option('--equation', '-e', default=None, help='输入公式')
 @click.option('--output-file', '-o', default=None, help='计算结果输出文件路径，不指定则输出到标准输出')
 def tex_sh(ds, equation, output_file):
-    ttp_process_ds(ds, 'test/ttp/ds.xml')
-    # {
-    #     "b*h==": r"$b\times h={}\mm\times 500\mm$"
-    # }
+    ttp_process_ds(ds, 'src/ttp/ds.xml')
+    {
+        "b*h==": r"$b\times h={}\mm\times 500\mm$"
+    }
+
     return 0
 
 
+@click.command('dsparser')
+@click.option('--ds', help='ds 文件路径')
+@click.option('--output-file', '-o', default=None, help='输出文件路径')
+def tex_sh(ds, output_file):
+    ttp_tmp = """
+<group name="assign_numeric">
+{{ var }}{{ eq | re("\s*=\s*") | strip(' ') }}{{ value | re("[\d\.]+") }}{{ unit | re("(\s+[^\s^,]+)*") | strip(' ') }}{{ comma | re("(\s*,\s*)*") | strip(' ') }}{{ command | re("(\"(.*)\")*") | strip(' "') }}
+</group>
+
+<group name="assign_str">
+{{ var }}{{ eq | re("\s*=\s*") | strip(' ') }}{{ value | re("\"(.*)\"") | strip('"') }}
+</group>
+
+<group name="unit">
+unit {{ name | re("[^=]+") }}{{ eq | re("(\s*=\s*)*") | strip(' ') }}{{ command | re("(\".*\")*") | strip(' "') }}
+</group>
+"""
+
+    return ttp_process_ds(ds, ttp_tmp)

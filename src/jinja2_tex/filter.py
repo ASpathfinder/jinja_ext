@@ -2,6 +2,7 @@ from jinja2 import pass_context, pass_environment, Environment, meta
 from jinja2.runtime import Context
 from jinja2.filters import do_mark_safe
 from .global_function import exp_env
+import subprocess
 
 mapping = {
     r"`b`*`h`=": r"$b\times h=`b`\mm\times `h`\mm$",
@@ -83,10 +84,11 @@ $$x_2= \frac{-b-\sqrt{ b^2-4ac}}{2a}=\frac{-3-\sqrt{ 3^2-4 \texttimes 1 \texttim
         },
     }
 
-    ast = exp_env.parse(expr)
-    vars_in_exp = meta.find_undeclared_variables(ast)
-    key_value = {var_name: ctx.vars.get(var_name) for var_name in vars_in_exp}
-    key = '{}{}{}'.format(kwargs.get('a'), kwargs.get('b'), kwargs.get('c'))
+    # ast = exp_env.parse(expr)
+    # vars_in_exp = meta.find_undeclared_variables(ast)
+    # key_value = {var_name: ctx.vars.get(var_name) for var_name in vars_in_exp}
+    # key = '{}{}{}'.format(kwargs.get('a'), kwargs.get('b'), kwargs.get('c'))
+    subprocess.call()
     equation_process = EquationProcess(
         **(mapping.get(key, {}))
     )
