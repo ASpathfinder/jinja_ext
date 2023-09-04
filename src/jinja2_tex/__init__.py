@@ -91,3 +91,12 @@ def ttp_pre_process(src_path, template_path):
 
     with open('test/output/3-18.tmpl.jinja2', 'w+', encoding='utf8') as f:
         f.write(body)
+
+
+def ttp_process_ds(src_path, template_path):
+    with open(src_path, encoding='utf8') as f:
+        for line in f.readlines():
+            parser = ttp(data=line, template=template_path)
+            parser.parse()
+            results = json.loads(parser.result(format='json')[0])
+            print(results)

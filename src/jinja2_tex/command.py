@@ -1,4 +1,4 @@
-from . import create_tex_env
+from . import create_tex_env, ttp_process_ds
 import click
 import os
 
@@ -28,3 +28,17 @@ def render_tex(template, output_dir):
 
     with open(os.path.join(output_dir, file_name), 'w+', encoding='utf8') as f:
         f.write(template_obj.render())
+
+
+@click.command('texsh')
+@click.option('--ds', help='ds 文件路径')
+@click.option('--equation', '-e', default=None, help='输入公式')
+@click.option('--output-file', '-o', default=None, help='计算结果输出文件路径，不指定则输出到标准输出')
+def tex_sh(ds, equation, output_file):
+    ttp_process_ds(ds, 'test/ttp/ds.xml')
+    # {
+    #     "b*h==": r"$b\times h={}\mm\times 500\mm$"
+    # }
+    return 0
+
+

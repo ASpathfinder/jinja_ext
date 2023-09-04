@@ -1,0 +1,25 @@
+<group name="assign_numeric">
+## {{ var }}{{ eq | re("\s*=\s*") }}{{ value | re("[\d\.]+") }}
+{{ var }}{{ eq | re("\s*=\s*") | strip(' ') }}{{ value | re("[\d\.]+") }}{{ unit | re("(\s+[^\s^,]+)*") }}{{ comma | re("(\s*,\s*)*") | strip(' ') }}{{ command | re("(\"(.*)\")*") | strip('"') }}
+</group>
+
+## <group name="assign_numeric_with_unit">
+## {{ var }}{{ eq | re("\s*=\s*") }}{{ value }}{{ unit | re("\s+[^\s]+") }}
+## </group>
+##
+## <group name="assign_numeric_with_command">
+## {{ var }}{{ eq | re("\s*=\s*") }}{{ value }}{{ comma | re("\s*,\s*") }}{{ command | re("\"(.*)\"") }}
+## </group>
+##
+## <group name="assign_numeric_with_unit_and_command">
+## {{ var }}{{ eq | re("\s*=\s*") }}{{ value }}{{ unit | re("\s+[^\s]+") }}{{ comma | re("\s*,\s*") }}{{ command | re("\"(.*)\"") }}
+## </group>
+
+<group name="assign_str">
+{{ var }}{{ eq | re("\s*=\s*") | strip(' ') }}{{ value | re("\"(.*)\"") | strip('"') }}
+</group>
+
+<group name="unit">
+unit {{ name }}{{ eq | re("(\s*=\s*)*") | strip(' ') }}{{ command | re("(\".*\")*") | strip('"') }}
+</group>
+
