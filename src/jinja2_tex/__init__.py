@@ -8,14 +8,13 @@ import os
 import re
 
 
-def create_tex_env(*args, template_folder, **kwargs):
+def create_tex_env(*args, template_folder: list, **kwargs):
     tex_env = Environment(
         *args,
         loader=ChoiceLoader([
             FileSystemLoader(os.path.join(os.environ.get('PYTHONPATH', ''), 'templates')),
             FileSystemLoader('templates'),
-            FileSystemLoader(template_folder),
-        ]),
+        ] + [FileSystemLoader(folder) for folder in template_folder]),
         autoescape=select_autoescape(),
         trim_blocks=True,
         lstrip_blocks=True,
@@ -35,12 +34,9 @@ def create_tex_env(*args, template_folder, **kwargs):
     return tex_env
 
 
-def ttp_pre_process(src_path, template_path):
+def ttp_pre_process(src_path, template_path, output_file):
     order = [
-        'var',
-        'op1',
         'equation',
-        'op2',
         'comma',
         'unit',
         'math_block',
@@ -48,10 +44,7 @@ def ttp_pre_process(src_path, template_path):
     ]
 
     convert_mapping = {
-        'var': r'{{ process("`ts`") }}',
-        'var_2': r'{{ process("`ts`") }}',
-        'var_with_unit': r'{{ process("`ts`") }}',
-        'equations': r'{{ process("`ts`") }}',
+        'equation': r'{{ process_equation("`ts`").result }}',
         'math_block': r'{% raw %}{% math %}{% endraw %}',
         'math_endblock': r'{% raw %}{% endmath %}{% endraw %}'
     }
@@ -61,7 +54,7 @@ def ttp_pre_process(src_path, template_path):
 
     replacement_mapping = {}
 
-    with open('test/templates/3-18.tmpl', encoding='utf8') as f:
+    with open(src_path, encoding='utf8') as f:
         for line in f.readlines():
             found = re.findall(r'(<.*?>)', line)
             if found:
@@ -70,35 +63,38 @@ def ttp_pre_process(src_path, template_path):
                     parser.parse()
                     results = json.loads(parser.result(format='json')[0])
                     print(tag)
-                    # print(results)
                     for match in results:
-                        for t in ["var", 'var_2', 'var_with_unit', 'equations', 'math_block', 'math_endblock']:
+                        for t in list(convert_mapping.keys()):
                             match_dict = match.get(t, None)
                             if match_dict:
                                 ordered_keys = sorted(match_dict.keys(), key=lambda k: order.index(k))
                                 ordered_match_dict = {key: match_dict.get(key) for key in ordered_keys}
+                                print(ordered_match_dict)
                                 ts_key = ''.join(ordered_match_dict.values())
                                 replacement_mapping['<{}>'.format(ts_key)] = exp_env.from_string(convert_mapping.get(t)).render(ts=ts_key)
 
-    print(json.dumps(replacement_mapping, indent=4, ensure_ascii=False))
+    # print(json.dumps(replacement_mapping, indent=4, ensure_ascii=False))
 
-    with open('test/templates/3-18.tmpl', encoding='utf8') as f:
+    with open(src_path, encoding='utf8') as f:
         body = f.read()
-        print(body)
+        # print(body)
         for k, v in replacement_mapping.items():
-            print(k, v)
+            # print(k, v)
             body = body.replace(k, v)
 
-    with open('test/output/3-18.tmpl.jinja2', 'w+', encoding='utf8') as f:
+    with open(output_file, 'w+', encoding='utf8') as f:
         f.write(body)
 
 
 def ttp_process_ds(src_path, template_path):
-
+    category = {}
     with open(src_path, encoding='utf8') as f:
         for line in f.readlines():
             parser = ttp(data=line, template=template_path)
             parser.parse()
             results = json.loads(parser.result(format='json')[0])
+            if results[0]:
+                key, value = list(results[0].items())[0]
+                category.setdefault(key, []).append(value)
 
-        return results
+    return category
